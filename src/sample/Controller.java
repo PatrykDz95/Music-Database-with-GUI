@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableView;
 import sample.model.Album;
 import sample.model.Artist;
@@ -12,13 +13,23 @@ import sample.model.Datasource;
 public class Controller {
 
     @FXML
+    private ProgressBar progressBar;
+
+    @FXML
     private TableView artistTable;
 
+    @FXML
     public void listArtist(){
         Task<ObservableList<Artist>> task = new GetAllArtistsTask();
         artistTable.itemsProperty().bind(task.valueProperty());
+        progressBar.progressProperty().bind(task.progressProperty());
+
+        progressBar.setVisible(true);
 
         new Thread(task).start();
+
+        task.setOnSucceeded(e -> progressBar.setVisible(false));
+        task.setOnFailed(e -> progressBar.setVisible(false));
     }
 
 public void listAlbumsForArtist(){
