@@ -47,8 +47,30 @@ public void listAlbumsForArtist(){
         };
         artistTable.itemsProperty().bind(task.valueProperty());
         new Thread(task).start();
-}
+    }
 
+    @FXML
+    public void updateArtist(){
+        final Artist artist = (Artist) artistTable.getItems().get(2); //getting the record
+        Task<Boolean> task = new Task<Boolean>() {
+            @Override
+            protected Boolean call() throws Exception {
+                return Datasource.getInstance().updateArtistName(artist.getId(), "AC/DC");
+            }
+        };
+
+        /*
+        if we successfully updated, we update the UI too
+        forcing a refresh because of a JavaFX bug
+        */
+        task.setOnSucceeded(e -> {
+            if(task.valueProperty().get()){
+                artist.setName("AC/DC");
+                artistTable.refresh();
+            }
+        });
+        new Thread(task).start();
+    }
 }
 
 class GetAllArtistsTask extends Task{
